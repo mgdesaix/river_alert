@@ -69,17 +69,13 @@ msg = subject + message
 # email from myself to both email addresses
 fromaddr = 'mgdesaix@gmail.com'
 toaddrs = ['mgdesaix@gmail.com', 'desaixmg@mymail.vcu.edu']
-# server = smtplib.SMTP('smtp.gmail.com', 587)
-# server.starttls()
+server = smtplib.SMTP('smtp.gmail.com', 587)
+server.starttls()
 # login name and password
-# server.login('mgdesaix@gmail.com', 'email_password')
+server.login('mgdesaix@gmail.com', 'email_password')
 # make sure to change gmail privacy app settings
 
-# print email's contents
-print('From: ' + fromaddr)
-print('To: ' + str(toaddrs))
-print('Message: ' + msg)
 
 # send the email
-# server.sendmail(fromaddr, toaddrs, msg)
-# server.quit()
+server.sendmail(fromaddr, toaddrs, msg)
+server.quit()
