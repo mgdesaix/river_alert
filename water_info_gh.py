@@ -2,12 +2,9 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sun Dec  3 20:41:18 2017
-
 @author: mdesaix
-
 This provides time, stage, and flow data for the Lower James River on the westham gage.  Run the script, email is sent.
 """
-
 import requests
 from bs4 import BeautifulSoup
 from dateutil import tz
@@ -24,8 +21,7 @@ def get_river_info(soup):
     river_info =[]
     for item in date_string:
         row = []
-        datum = item.find_parent('datum')
-        
+        datum = item.find_parent('datum') 
         #Date/time
         #set zones: the river gage data uses UTC, the to_zone is set as local
         from_zone = tz.gettz('UTC')
