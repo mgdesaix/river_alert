@@ -14,16 +14,12 @@ from dateutil import tz
 from datetime import datetime
 import smtplib
 
-url = "https://water.weather.gov/ahps2/hydrograph_to_xml.php?gage=rmdv2&output=xml"
-headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
-response = requests.get(url, headers)
-soup = BeautifulSoup(response.text, "lxml")
-
-
-
+url = "https://water.weather.gov/ahps2/hydrograph_to_xml.php?gage=rmdv2"
+response = requests.get(url)
+soup = BeautifulSoup(response.text, "xml")
 def get_river_info(soup):
     forecast = soup.find('forecast')
-    # 'valid' is the tag for date/time
+    # 'valid' is the tag for date/time, I just want the first 4 instances
     date_string = forecast.find_all('valid')[0:4]
     river_info =[]
     for item in date_string:
@@ -42,11 +38,10 @@ def get_river_info(soup):
         utc = utc.replace(tzinfo=from_zone)
         local_time = utc.astimezone(to_zone)
         row.append(local_time)
-        
-        # river height, specified by 'primary' tag
+        # river height/stage, specified by 'primary' tag
         height = str(datum.primary.text)
         row.append(height)
-        # flow, specified by 'tag'
+        # flow, specified by 'secondary'tag
         flow = str(datum.secondary.text)
         row.append(flow)
         river_info.append(row)
@@ -58,6 +53,7 @@ name = soup.site['name']
 subject = 'Subject: River information for %s\n' % name
 message = name + '\n'
 for row in river_info:
+    # convert kcfs to cfs...cause
     flow_int = 1000 * float(row[2])
     message += '\nTime: ' + str(row[0])
     message += '\nHeight: ' + row[1] + ' feet'
@@ -69,13 +65,17 @@ msg = subject + message
 # email from myself to both email addresses
 fromaddr = 'mgdesaix@gmail.com'
 toaddrs = ['mgdesaix@gmail.com', 'desaixmg@mymail.vcu.edu']
-server = smtplib.SMTP('smtp.gmail.com', 587)
-server.starttls()
-# login name and password
-server.login('mgdesaix@gmail.com', 'email_password')
+# If I was to actually run this I would uncomment these:
+# server = smtplib.SMTP('smtp.gmail.com', 587)
+# server.starttls()
+# server.login('mgdesaix@gmail.com', 'email_password')
+
 # make sure to change gmail privacy app settings
-
-
+# print email's contents
+print('From: ' + fromaddr)
+print('To: ' + str(toaddrs))
+print('Message: ' + msg)
+# uncomment these:
 # send the email
-server.sendmail(fromaddr, toaddrs, msg)
-server.quit()
+# server.sendmail(fromaddr, toaddrs, msg)
+# server.quit()
